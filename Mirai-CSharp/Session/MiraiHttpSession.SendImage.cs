@@ -101,9 +101,12 @@ namespace Mirai_CSharp
                 Name = "type"
             };
             string format;
-            using (SKCodec codec = SKCodec.Create(imgStream))
+            using MemoryStream codecMemoryStream = new MemoryStream();
+            imgStream.CopyTo(codecMemoryStream);
+            codecMemoryStream.Seek(0, SeekOrigin.Begin);
+            using (SKCodec codec = SKCodec.Create(codecMemoryStream))
             {
-                
+
                 var skformat = codec.EncodedFormat;
                 format = skformat.ToString().ToLower();
                 switch (skformat)
@@ -113,6 +116,7 @@ namespace Mirai_CSharp
                     case SKEncodedImageFormat.Png:
                         break;
                     default:
+                        imgStream.Seek(0, SeekOrigin.Begin);
                         using (SKBitmap bitmap = SKBitmap.Decode(imgStream))
                         {
                             MemoryStream ms = new MemoryStream();
